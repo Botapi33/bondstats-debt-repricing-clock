@@ -6,266 +6,351 @@
 
 <title>U.S. Debt Repricing Clock | BondStats</title>
 
-<meta name="description"
-content="Track estimated U.S. Treasury debt maturities over the next 30 days, 90 days and 12 months, upcoming maturities and refinancing pressure.">
-
 <style>
 
-* {
-  box-sizing: border-box;
+:root{
+  --bg:#050607;
+  --panel:#0b0d10;
+  --panel2:#0f1216;
+  --line:#22272d;
+  --text:#f4f4f4;
+  --muted:#858b93;
+  --gold:#d4ab4f;
+  --green:#53c792;
+  --red:#e46f6f;
 }
 
-body {
-  margin: 0;
-  background: #050505;
-  color: #f5f5f5;
-  font-family: Arial, Helvetica, sans-serif;
+*{
+  box-sizing:border-box;
 }
 
-.container {
-  width: min(1150px, 92%);
-  margin: auto;
-  padding: 55px 0 80px;
+html,body{
+  margin:0;
+  padding:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Arial,
+    sans-serif;
 }
 
-.top {
-  margin-bottom: 45px;
+.dashboard{
+  width:100%;
+  max-width:1400px;
+  margin:0 auto;
+  padding:18px;
 }
 
-.brand {
-  font-size: 13px;
-  letter-spacing: 4px;
-  color: #cda94d;
-  margin-bottom: 20px;
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:4px 2px 16px;
+  border-bottom:1px solid var(--line);
 }
 
-h1 {
-  font-size: clamp(38px, 6vw, 70px);
-  line-height: 1;
-  margin: 0 0 18px;
-  letter-spacing: -2px;
+.brand{
+  font-size:12px;
+  letter-spacing:3px;
+  color:var(--gold);
+  font-weight:700;
 }
 
-.subtitle {
-  color: #9c9c9c;
-  max-width: 760px;
-  line-height: 1.7;
-  font-size: 16px;
+.live{
+  color:var(--muted);
+  font-size:11px;
 }
 
-.hero {
-  border-top: 1px solid #242424;
-  border-bottom: 1px solid #242424;
-  padding: 42px 0;
+.live-dot{
+  display:inline-block;
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:var(--green);
+  margin-right:6px;
 }
 
-.hero-label {
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  color: #888;
+.title-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:end;
+  gap:20px;
+  padding:20px 0 16px;
 }
 
-.hero-number {
-  font-size: clamp(54px, 10vw, 105px);
-  font-weight: 700;
-  margin: 10px 0;
-  letter-spacing: -4px;
+.title{
+  font-size:26px;
+  font-weight:700;
+  letter-spacing:-.4px;
 }
 
-.hero-text {
-  color: #999;
+.updated{
+  color:var(--muted);
+  font-size:11px;
+  white-space:nowrap;
 }
 
-.cards {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1px;
-  background: #262626;
-  margin-top: 35px;
+.hero-grid{
+  display:grid;
+  grid-template-columns:2fr 1fr 1fr;
+  gap:10px;
 }
 
-.card {
-  background: #090909;
-  padding: 28px;
+.hero{
+  background:var(--panel);
+  border:1px solid var(--line);
+  padding:22px;
+  min-height:145px;
 }
 
-.card-label {
-  font-size: 11px;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: #7f7f7f;
+.metric-title{
+  color:var(--muted);
+  font-size:10px;
+  letter-spacing:1.4px;
+  text-transform:uppercase;
 }
 
-.card-value {
-  font-size: 30px;
-  font-weight: 600;
-  margin-top: 9px;
+.big-number{
+  font-size:54px;
+  line-height:1;
+  font-weight:750;
+  margin:12px 0 8px;
+  letter-spacing:-2px;
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  margin-top: 40px;
+.gold{
+  color:var(--gold);
 }
 
-.panel {
-  border: 1px solid #242424;
-  padding: 28px;
+.sub{
+  color:var(--muted);
+  font-size:12px;
 }
 
-.panel h2 {
-  margin: 0 0 25px;
-  font-size: 20px;
+.metric-value{
+  font-size:30px;
+  margin-top:13px;
+  font-weight:700;
 }
 
-.next-value {
-  font-size: 39px;
-  font-weight: 700;
+.metrics{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+  margin-top:10px;
 }
 
-.muted {
-  color: #888;
-  margin-top: 7px;
+.metric{
+  background:var(--panel);
+  border:1px solid var(--line);
+  padding:17px;
 }
 
-.countdown {
-  font-size: 26px;
-  color: #cda94d;
-  margin-top: 25px;
-  font-variant-numeric: tabular-nums;
+.metric-small{
+  color:var(--muted);
+  font-size:10px;
+  text-transform:uppercase;
+  letter-spacing:1.1px;
 }
 
-.score {
-  font-size: 58px;
-  font-weight: 700;
+.metric-number{
+  font-size:24px;
+  font-weight:700;
+  margin-top:9px;
 }
 
-.score-label {
-  color: #cda94d;
+.main-grid{
+  display:grid;
+  grid-template-columns:1.05fr 1.95fr;
+  gap:10px;
+  margin-top:10px;
 }
 
-.bar-shell {
-  width: 100%;
-  height: 7px;
-  background: #202020;
-  margin-top: 25px;
+.panel{
+  background:var(--panel);
+  border:1px solid var(--line);
+  padding:18px;
 }
 
-.bar {
-  width: 0;
-  height: 100%;
-  background: #cda94d;
-  transition: width .7s ease;
+.panel-title{
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:.8px;
+  text-transform:uppercase;
+  margin-bottom:16px;
 }
 
-.section {
-  margin-top: 50px;
+.next-amount{
+  font-size:36px;
+  font-weight:750;
 }
 
-.section h2 {
-  font-size: 22px;
-  margin-bottom: 20px;
+.next-desc{
+  color:var(--muted);
+  font-size:12px;
+  margin-top:5px;
 }
 
-.chart {
-  height: 220px;
-  display: flex;
-  align-items: flex-end;
-  gap: 10px;
-  border-bottom: 1px solid #292929;
-  padding-top: 15px;
+.countdown{
+  font-size:26px;
+  font-weight:700;
+  margin-top:20px;
+  color:var(--gold);
+  font-variant-numeric:tabular-nums;
 }
 
-.month-column {
-  flex: 1;
-  min-width: 28px;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
+.next-date{
+  color:var(--muted);
+  font-size:11px;
+  margin-top:4px;
 }
 
-.month-bar {
-  background: #cda94d;
-  min-height: 2px;
-  opacity: .88;
+.pressure{
+  margin-top:22px;
 }
 
-.month-label {
-  color: #777;
-  text-align: center;
-  font-size: 10px;
-  margin-top: 8px;
+.pressure-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:end;
 }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
+.pressure-score{
+  font-size:34px;
+  font-weight:750;
 }
 
-th {
-  text-align: left;
-  color: #777;
-  font-size: 11px;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  padding: 12px 8px;
+.pressure-label{
+  color:var(--gold);
+  font-size:12px;
 }
 
-td {
-  border-top: 1px solid #202020;
-  padding: 14px 8px;
-  font-size: 14px;
+.track{
+  height:5px;
+  background:#1c2025;
+  margin-top:10px;
 }
 
-.right {
-  text-align: right;
+.fill{
+  height:100%;
+  width:0;
+  background:var(--gold);
+  transition:.5s ease;
 }
 
-.method {
-  color: #888;
-  font-size: 13px;
-  line-height: 1.7;
-  border-top: 1px solid #242424;
-  margin-top: 55px;
-  padding-top: 25px;
+.chart{
+  height:180px;
+  display:flex;
+  align-items:flex-end;
+  gap:6px;
+  padding-top:10px;
 }
 
-.status {
-  display: inline-block;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #61c693;
-  margin-right: 7px;
+.bar-wrap{
+  flex:1;
+  min-width:16px;
+  display:flex;
+  height:100%;
+  flex-direction:column;
+  justify-content:flex-end;
 }
 
-.error {
-  color: #ff7777;
+.bar{
+  background:var(--gold);
+  opacity:.85;
+  min-height:2px;
 }
 
-@media (max-width: 800px) {
+.month{
+  text-align:center;
+  color:#6e737a;
+  font-size:9px;
+  padding-top:5px;
+}
 
-  .cards {
-    grid-template-columns: 1fr 1fr;
+.table-wrap{
+  margin-top:10px;
+  background:var(--panel);
+  border:1px solid var(--line);
+}
+
+table{
+  border-collapse:collapse;
+  width:100%;
+}
+
+th{
+  color:var(--muted);
+  font-size:9px;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  font-weight:600;
+  padding:10px 12px;
+  text-align:left;
+}
+
+td{
+  padding:10px 12px;
+  border-top:1px solid #1c2024;
+  font-size:12px;
+}
+
+.right{
+  text-align:right;
+}
+
+.footer{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  color:#61676e;
+  font-size:9px;
+  padding:10px 2px 0;
+}
+
+.error{
+  color:var(--red);
+}
+
+@media(max-width:850px){
+
+  .hero-grid{
+    grid-template-columns:1fr;
   }
 
-  .grid {
-    grid-template-columns: 1fr;
+  .metrics{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .main-grid{
+    grid-template-columns:1fr;
   }
 
 }
 
-@media (max-width: 500px) {
+@media(max-width:500px){
 
-  .cards {
-    grid-template-columns: 1fr;
+  .dashboard{
+    padding:10px;
   }
 
-  .hero-number {
-    letter-spacing: -2px;
+  .title-row{
+    display:block;
+  }
+
+  .updated{
+    margin-top:6px;
+  }
+
+  .metrics{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .big-number{
+    font-size:45px;
   }
 
 }
@@ -275,75 +360,142 @@ td {
 
 <body>
 
-<div class="container">
+<div class="dashboard">
 
-  <div class="top">
+  <div class="header">
 
     <div class="brand">
-      BONDSTATS · SOVEREIGN FUNDING INTELLIGENCE
+      BONDSTATS
     </div>
 
-    <h1>U.S. Debt Repricing Clock</h1>
-
-    <div class="subtitle">
-      Track estimated U.S. Treasury debt approaching maturity
-      and see how much refinancing pressure is concentrated
-      in the next 30 days, 90 days and 12 months.
+    <div class="live">
+      <span class="live-dot"></span>
+      U.S. Treasury Data
     </div>
 
   </div>
 
-  <div class="hero">
+  <div class="title-row">
 
-    <div class="hero-label">
-      Estimated Treasury debt maturing within 12 months
+    <div class="title">
+      U.S. Debt Repricing Clock
     </div>
 
-    <div class="hero-number" id="yearValue">
-      Loading…
-    </div>
-
-    <div class="hero-text">
-      Based on scheduled maturities of U.S. Treasury marketable securities.
+    <div class="updated">
+      Updated <span id="updated">—</span>
     </div>
 
   </div>
 
-  <div class="cards">
+  <div class="hero-grid">
 
-    <div class="card">
-      <div class="card-label">Next 30 Days</div>
-      <div class="card-value" id="d30">—</div>
-    </div>
+    <div class="hero">
 
-    <div class="card">
-      <div class="card-label">Next 90 Days</div>
-      <div class="card-value" id="d90">—</div>
-    </div>
+      <div class="metric-title">
+        Debt Maturing Within 12 Months
+      </div>
 
-    <div class="card">
-      <div class="card-label">Average / Day</div>
-      <div class="card-value" id="daily">—</div>
-    </div>
-
-    <div class="card">
-      <div class="card-label">Average / Month</div>
-      <div class="card-value" id="monthly">—</div>
-    </div>
-
-  </div>
-
-  <div class="grid">
-
-    <div class="panel">
-
-      <h2>Next Major Maturity</h2>
-
-      <div class="next-value" id="nextAmount">
+      <div class="big-number gold" id="yearValue">
         —
       </div>
 
-      <div class="muted" id="nextDescription">
+      <div class="sub">
+        Estimated U.S. Treasury refinancing requirement
+      </div>
+
+    </div>
+
+    <div class="hero">
+
+      <div class="metric-title">
+        Next 30 Days
+      </div>
+
+      <div class="metric-value" id="d30">
+        —
+      </div>
+
+      <div class="sub">
+        Near-term maturities
+      </div>
+
+    </div>
+
+    <div class="hero">
+
+      <div class="metric-title">
+        Next 90 Days
+      </div>
+
+      <div class="metric-value" id="d90">
+        —
+      </div>
+
+      <div class="sub">
+        Quarterly refinancing load
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="metrics">
+
+    <div class="metric">
+      <div class="metric-small">
+        Average / Day
+      </div>
+
+      <div class="metric-number" id="daily">
+        —
+      </div>
+    </div>
+
+    <div class="metric">
+      <div class="metric-small">
+        Average / Month
+      </div>
+
+      <div class="metric-number" id="monthly">
+        —
+      </div>
+    </div>
+
+    <div class="metric">
+      <div class="metric-small">
+        Next Major Maturity
+      </div>
+
+      <div class="metric-number" id="nextCompact">
+        —
+      </div>
+    </div>
+
+    <div class="metric">
+      <div class="metric-small">
+        Pressure Score
+      </div>
+
+      <div class="metric-number gold" id="scoreCompact">
+        —
+      </div>
+    </div>
+
+  </div>
+
+  <div class="main-grid">
+
+    <div class="panel">
+
+      <div class="panel-title">
+        Next Major Maturity
+      </div>
+
+      <div class="next-amount" id="nextAmount">
+        —
+      </div>
+
+      <div class="next-desc" id="nextDescription">
         —
       </div>
 
@@ -351,94 +503,79 @@ td {
         —
       </div>
 
-      <div class="muted" id="nextDate">
+      <div class="next-date" id="nextDate">
         —
+      </div>
+
+      <div class="pressure">
+
+        <div class="pressure-top">
+
+          <div>
+
+            <div class="metric-small">
+              Refinancing Pressure
+            </div>
+
+            <div class="pressure-score" id="score">
+              —
+            </div>
+
+          </div>
+
+          <div class="pressure-label" id="scoreLabel">
+            —
+          </div>
+
+        </div>
+
+        <div class="track">
+          <div class="fill" id="pressureBar"></div>
+        </div>
+
       </div>
 
     </div>
 
     <div class="panel">
 
-      <h2>Refinancing Pressure</h2>
-
-      <div class="score" id="score">
-        —
+      <div class="panel-title">
+        12-Month Maturity Profile
       </div>
 
-      <div class="score-label" id="scoreLabel">
-        —
-      </div>
-
-      <div class="bar-shell">
-        <div class="bar" id="pressureBar"></div>
-      </div>
-
-      <div class="muted" style="margin-top:18px;">
-        Based on the concentration of Treasury maturities
-        during the next 12 months.
-      </div>
+      <div class="chart" id="chart"></div>
 
     </div>
 
   </div>
 
-  <div class="section">
+  <div class="table-wrap">
 
-    <h2>12-Month Maturity Profile</h2>
+    <table>
 
-    <div class="chart" id="chart"></div>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Security</th>
+          <th>CUSIPs</th>
+          <th class="right">Estimated Amount</th>
+        </tr>
+      </thead>
 
-  </div>
+      <tbody id="rows"></tbody>
 
-  <div class="section">
-
-    <h2>Upcoming Maturities</h2>
-
-    <div style="overflow-x:auto;">
-
-      <table>
-
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Security</th>
-            <th>CUSIPs</th>
-            <th class="right">Estimated Amount</th>
-          </tr>
-        </thead>
-
-        <tbody id="rows"></tbody>
-
-      </table>
-
-    </div>
+    </table>
 
   </div>
 
-  <div class="method">
+  <div class="footer">
 
     <div>
-      <span class="status"></span>
-      U.S. Treasury Fiscal Data
+      Source: U.S. Treasury Fiscal Data
     </div>
 
-    <p>
-      Maturity dates and auction information are sourced from
-      official U.S. Treasury Fiscal Data. Securities are grouped
-      by CUSIP to consolidate reopenings.
-    </p>
-
-    <p>
-      Displayed maturity amounts are analytical estimates derived
-      from accepted Treasury auction principal. They should not be
-      interpreted as an official Treasury forecast of future
-      refinancing activity or as the exact current amount outstanding
-      for each security.
-    </p>
-
     <div>
-      Last updated:
-      <span id="updated">—</span>
+      BondStats Sovereign Funding Intelligence
     </div>
 
   </div>
@@ -448,113 +585,73 @@ td {
 <script>
 
 const API =
-  "https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v1/accounting/od/auctions_query";
+"https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v1/accounting/od/auctions_query";
 
 let nextMaturityDate = null;
 
-function formatDateUTC(date) {
-
-  return date
-    .toISOString()
-    .slice(0, 10);
-
+function dateString(d){
+  return d.toISOString().slice(0,10);
 }
 
-function addDays(date, days) {
-
-  const d = new Date(date);
-
-  d.setUTCDate(
-    d.getUTCDate() + days
-  );
-
-  return d;
-
+function addDays(d,n){
+  const x = new Date(d);
+  x.setUTCDate(x.getUTCDate()+n);
+  return x;
 }
 
-function number(v) {
+function num(v){
+  const x =
+    Number(String(v ?? "").replace(/,/g,""));
 
-  const n =
-    Number(
-      String(v ?? "")
-        .replace(/,/g, "")
-    );
-
-  return Number.isFinite(n)
-    ? n
+  return Number.isFinite(x)
+    ? x
     : 0;
+}
+
+function money(v){
+
+  const a = Math.abs(v);
+
+  if(a >= 1e12)
+    return "$" + (v/1e12).toFixed(2) + "T";
+
+  if(a >= 1e9)
+    return "$" + (v/1e9).toFixed(1) + "B";
+
+  if(a >= 1e6)
+    return "$" + (v/1e6).toFixed(1) + "M";
+
+  return "$" + Math.round(v).toLocaleString();
 
 }
 
-function money(v) {
-
-  const a =
-    Math.abs(v);
-
-  if (a >= 1e12)
-    return "$" +
-      (v / 1e12).toFixed(2) +
-      "T";
-
-  if (a >= 1e9)
-    return "$" +
-      (v / 1e9).toFixed(1) +
-      "B";
-
-  if (a >= 1e6)
-    return "$" +
-      (v / 1e6).toFixed(1) +
-      "M";
-
-  return "$" +
-    Math.round(v)
-      .toLocaleString();
-
-}
-
-function pressureScore(total) {
-
-  /*
-    $5T within twelve months
-    maps approximately to 100.
-
-    This is intentionally transparent
-    rather than an opaque AI score.
-  */
+function scoreFor(total){
 
   return Math.min(
     100,
     Math.round(
       total /
-      5_000_000_000_000 *
+      5000000000000 *
       100
     )
   );
 
 }
 
-function pressureLabel(score) {
+function labelFor(score){
 
-  if (score >= 80)
-    return "Extreme";
+  if(score >= 80) return "EXTREME";
+  if(score >= 65) return "HIGH";
+  if(score >= 45) return "ELEVATED";
+  if(score >= 25) return "MODERATE";
 
-  if (score >= 65)
-    return "High";
-
-  if (score >= 45)
-    return "Elevated";
-
-  if (score >= 25)
-    return "Moderate";
-
-  return "Low";
+  return "LOW";
 
 }
 
-function updateCountdown() {
+function updateCountdown(){
 
-  if (!nextMaturityDate)
-    return;
+  if(!nextMaturityDate) return;
 
   const target =
     new Date(
@@ -566,143 +663,118 @@ function updateCountdown() {
     target.getTime() -
     Date.now();
 
-  if (diff <= 0) {
+  if(diff <= 0){
 
-    document
-      .getElementById("countdown")
+    document.getElementById("countdown")
       .textContent =
-      "Maturing Today";
+      "MATURING TODAY";
 
     return;
 
   }
 
-  const days =
-    Math.floor(
-      diff / 86400000
-    );
+  const d =
+    Math.floor(diff / 86400000);
 
-  diff -=
-    days * 86400000;
+  diff -= d * 86400000;
 
-  const hours =
-    Math.floor(
-      diff / 3600000
-    );
+  const h =
+    Math.floor(diff / 3600000);
 
-  diff -=
-    hours * 3600000;
+  diff -= h * 3600000;
 
-  const minutes =
-    Math.floor(
-      diff / 60000
-    );
+  const m =
+    Math.floor(diff / 60000);
 
-  document
-    .getElementById("countdown")
+  document.getElementById("countdown")
     .textContent =
-    `${days}d ${String(hours).padStart(2,"0")}h ${String(minutes).padStart(2,"0")}m`;
+    `${d}D ${String(h).padStart(2,"0")}H ${String(m).padStart(2,"0")}M`;
 
 }
 
-function buildChart(months) {
+function drawChart(months){
 
-  const el =
-    document
-      .getElementById("chart");
+  const chart =
+    document.getElementById("chart");
 
-  el.innerHTML = "";
-
-  const values =
-    [...months.values()];
+  chart.innerHTML = "";
 
   const max =
-    Math.max(...values, 1);
+    Math.max(
+      ...months.values(),
+      1
+    );
 
-  months.forEach(
-    (amount, month) => {
+  months.forEach((amount,month)=>{
 
-      const wrap =
-        document
-          .createElement("div");
+    const wrap =
+      document.createElement("div");
 
-      wrap.className =
-        "month-column";
+    wrap.className =
+      "bar-wrap";
 
-      const bar =
-        document
-          .createElement("div");
+    const bar =
+      document.createElement("div");
 
-      bar.className =
-        "month-bar";
+    bar.className =
+      "bar";
 
-      bar.style.height =
-        Math.max(
-          2,
-          amount / max * 185
-        ) + "px";
+    bar.style.height =
+      Math.max(
+        2,
+        amount/max*145
+      ) + "px";
 
-      bar.title =
-        month +
-        ": " +
-        money(amount);
+    bar.title =
+      month + " · " + money(amount);
 
-      const label =
-        document
-          .createElement("div");
+    const label =
+      document.createElement("div");
 
-      label.className =
-        "month-label";
+    label.className =
+      "month";
 
-      label.textContent =
-        month.slice(5);
+    label.textContent =
+      month.slice(5);
 
-      wrap.appendChild(bar);
-      wrap.appendChild(label);
+    wrap.append(bar,label);
 
-      el.appendChild(wrap);
+    chart.appendChild(wrap);
 
-    }
-  );
+  });
 
 }
 
-function buildTable(groups) {
+function drawTable(groups){
 
   const body =
-    document
-      .getElementById("rows");
+    document.getElementById("rows");
 
   body.innerHTML = "";
 
-  groups
-    .slice(0, 15)
-    .forEach(group => {
+  groups.slice(0,10).forEach(g=>{
 
-      const tr =
-        document
-          .createElement("tr");
+    const tr =
+      document.createElement("tr");
 
-      tr.innerHTML = `
-        <td>${group.date}</td>
-        <td>${group.types.join(", ")}</td>
-        <td>${group.cusips.length}</td>
-        <td class="right">${money(group.amount)}</td>
-      `;
+    tr.innerHTML = `
+      <td>${g.date}</td>
+      <td>${g.types.join(" · ")}</td>
+      <td>${g.cusips.length}</td>
+      <td class="right">${money(g.amount)}</td>
+    `;
 
-      body
-        .appendChild(tr);
+    body.appendChild(tr);
 
-    });
+  });
 
 }
 
-async function loadClock() {
+async function load(){
 
-  try {
+  try{
 
-    const today =
-      new Date();
+    const today = new Date();
 
     const start =
       new Date(
@@ -714,12 +786,12 @@ async function loadClock() {
       );
 
     const end =
-      addDays(start, 365);
+      addDays(start,365);
 
     const params =
       new URLSearchParams({
 
-        fields: [
+        fields:[
           "cusip",
           "security_type",
           "security_term",
@@ -729,17 +801,14 @@ async function loadClock() {
         ].join(","),
 
         filter:
-          `maturity_date:gte:${formatDateUTC(start)},` +
-          `maturity_date:lte:${formatDateUTC(end)}`,
+          `maturity_date:gte:${dateString(start)},` +
+          `maturity_date:lte:${dateString(end)}`,
 
-        sort:
-          "maturity_date",
+        sort:"maturity_date",
 
-        "page[size]":
-          "10000",
+        "page[size]":"10000",
 
-        format:
-          "json"
+        format:"json"
 
       });
 
@@ -750,10 +819,8 @@ async function loadClock() {
         params.toString()
       );
 
-    if (!response.ok)
-      throw new Error(
-        "Treasury API request failed."
-      );
+    if(!response.ok)
+      throw new Error("Treasury API error");
 
     const json =
       await response.json();
@@ -764,52 +831,31 @@ async function loadClock() {
     const securities =
       new Map();
 
-    raw.forEach(row => {
+    raw.forEach(r=>{
 
-      if (
-        !row.cusip ||
-        !row.maturity_date
-      )
+      if(!r.cusip || !r.maturity_date)
         return;
 
       const amount =
-        number(
-          row.total_accepted
-        ) ||
-        number(
-          row.offering_amt
-        );
+        num(r.total_accepted) ||
+        num(r.offering_amt);
 
-      if (!securities.has(row.cusip)) {
+      if(!securities.has(r.cusip)){
 
         securities.set(
-          row.cusip,
+          r.cusip,
           {
-            cusip:
-              row.cusip,
-
-            maturity:
-              row.maturity_date,
-
-            type:
-              row.security_type ||
-              "Treasury",
-
-            term:
-              row.security_term ||
-              "",
-
-            amount:
-              amount
+            cusip:r.cusip,
+            maturity:r.maturity_date,
+            type:r.security_type || "Treasury",
+            term:r.security_term || "",
+            amount
           }
         );
 
-      } else {
+      }else{
 
-        securities
-          .get(row.cusip)
-          .amount +=
-          amount;
+        securities.get(r.cusip).amount += amount;
 
       }
 
@@ -818,126 +864,86 @@ async function loadClock() {
     const list =
       [...securities.values()]
         .sort(
-          (a,b) =>
+          (a,b)=>
             new Date(a.maturity) -
             new Date(b.maturity)
         );
 
-    const totalWithin =
-      days => {
+    function total(days){
 
-        const cutoff =
-          addDays(
-            start,
-            days
-          );
+      const cutoff =
+        addDays(start,days);
 
-        return list
-          .filter(
-            x =>
-              new Date(
-                x.maturity +
-                "T00:00:00Z"
-              ) <= cutoff
-          )
-          .reduce(
-            (sum,x) =>
-              sum + x.amount,
-            0
-          );
+      return list
+        .filter(
+          x =>
+            new Date(
+              x.maturity +
+              "T00:00:00Z"
+            ) <= cutoff
+        )
+        .reduce(
+          (s,x)=>
+            s+x.amount,
+          0
+        );
 
-      };
+    }
 
-    const m30 =
-      totalWithin(30);
+    const d30 = total(30);
+    const d90 = total(90);
+    const d365 = total(365);
 
-    const m90 =
-      totalWithin(90);
-
-    const m365 =
-      totalWithin(365);
-
-    document
-      .getElementById("yearValue")
+    document.getElementById("yearValue")
       .textContent =
-      money(m365);
+      money(d365);
 
-    document
-      .getElementById("d30")
+    document.getElementById("d30")
       .textContent =
-      money(m30);
+      money(d30);
 
-    document
-      .getElementById("d90")
+    document.getElementById("d90")
       .textContent =
-      money(m90);
+      money(d90);
 
-    document
-      .getElementById("daily")
+    document.getElementById("daily")
       .textContent =
-      money(
-        m365 / 365
-      );
+      money(d365/365);
 
-    document
-      .getElementById("monthly")
+    document.getElementById("monthly")
       .textContent =
-      money(
-        m365 / 12
-      );
-
-    /*
-      Group maturity amounts by date.
-    */
+      money(d365/12);
 
     const grouped =
       new Map();
 
-    list.forEach(x => {
+    list.forEach(x=>{
 
-      if (!grouped.has(x.maturity)) {
+      if(!grouped.has(x.maturity)){
 
         grouped.set(
           x.maturity,
           {
-            date:
-              x.maturity,
-
-            amount:
-              0,
-
-            cusips:
-              [],
-
-            types:
-              []
+            date:x.maturity,
+            amount:0,
+            cusips:[],
+            types:[]
           }
         );
 
       }
 
       const g =
-        grouped.get(
-          x.maturity
-        );
+        grouped.get(x.maturity);
 
-      g.amount +=
-        x.amount;
+      g.amount += x.amount;
 
-      g.cusips.push(
-        x.cusip
-      );
+      g.cusips.push(x.cusip);
 
       const type =
-        (
-          x.term +
-          " " +
-          x.type
-        ).trim();
+        (x.term+" "+x.type).trim();
 
-      if (
-        !g.types.includes(type)
-      )
+      if(!g.types.includes(type))
         g.types.push(type);
 
     });
@@ -945,53 +951,36 @@ async function loadClock() {
     const groups =
       [...grouped.values()]
         .sort(
-          (a,b) =>
+          (a,b)=>
             new Date(a.date) -
             new Date(b.date)
         );
 
-    /*
-      Major maturity =
-      first maturity date
-      exceeding $25bn.
-
-      If none exists,
-      next maturity is used.
-    */
-
     const major =
       groups.find(
         x =>
-          x.amount >=
-          25_000_000_000
+          x.amount >= 25000000000
       ) ||
       groups[0];
 
-    if (major) {
+    if(major){
 
       nextMaturityDate =
         major.date;
 
-      document
-        .getElementById(
-          "nextAmount"
-        )
+      document.getElementById("nextAmount")
         .textContent =
-        money(
-          major.amount
-        );
+        money(major.amount);
 
-      document
-        .getElementById(
-          "nextDescription"
-        )
+      document.getElementById("nextCompact")
+        .textContent =
+        money(major.amount);
+
+      document.getElementById("nextDescription")
         .textContent =
         major.types.join(" · ");
 
-      document
-        .getElementById(
-          "nextDate"
-        )
+      document.getElementById("nextDate")
         .textContent =
         major.date;
 
@@ -1000,85 +989,63 @@ async function loadClock() {
     }
 
     const score =
-      pressureScore(
-        m365
-      );
+      scoreFor(d365);
 
-    document
-      .getElementById("score")
+    document.getElementById("score")
       .textContent =
       score;
 
-    document
-      .getElementById(
-        "scoreLabel"
-      )
+    document.getElementById("scoreCompact")
       .textContent =
-      pressureLabel(
-        score
-      );
+      score;
 
-    document
-      .getElementById(
-        "pressureBar"
-      )
+    document.getElementById("scoreLabel")
+      .textContent =
+      labelFor(score);
+
+    document.getElementById("pressureBar")
       .style.width =
-      score + "%";
-
-    /*
-      Monthly aggregation.
-    */
+      score+"%";
 
     const months =
       new Map();
 
-    list.forEach(x => {
+    list.forEach(x=>{
 
       const month =
-        x.maturity
-          .slice(0,7);
+        x.maturity.slice(0,7);
 
       months.set(
         month,
-        (
-          months.get(month) ||
-          0
-        ) +
+        (months.get(month)||0) +
         x.amount
       );
 
     });
 
-    buildChart(months);
+    drawChart(months);
 
-    buildTable(groups);
+    drawTable(groups);
 
-    document
-      .getElementById(
-        "updated"
-      )
+    document.getElementById("updated")
       .textContent =
-      new Date()
-        .toLocaleString();
+      new Date().toLocaleString();
 
   }
 
-  catch(error) {
+  catch(err){
 
-    console.error(error);
+    console.error(err);
 
-    document
-      .getElementById(
-        "yearValue"
-      )
+    document.getElementById("yearValue")
       .innerHTML =
-      '<span class="error">Data unavailable</span>';
+      '<span class="error">DATA UNAVAILABLE</span>';
 
   }
 
 }
 
-loadClock();
+load();
 
 setInterval(
   updateCountdown,
