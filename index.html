@@ -1,937 +1,841 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Debt Repricing Clock | BondStats</title>
 
+<meta name="description"
+content="Track U.S. sovereign debt maturities, refinancing requirements and repricing costs.">
+
 <style>
-
-:root{
-  --bg:#050505;
-  --panel:#0b0b0c;
-  --line:#29292b;
-  --text:#f4f4f2;
-  --muted:#858589;
-  --gold:#d5af55;
-  --red:#ff7a72;
-  --green:#61c993;
+:root {
+  --bg: #050505;
+  --panel: #0b0b0c;
+  --panel-soft: #0e0e10;
+  --line: #242426;
+  --text: #f4f4f2;
+  --muted: #858589;
+  --gold: #d3ad5b;
+  --green: #59c995;
+  --red: #e16b6b;
 }
 
-*{
-  box-sizing:border-box;
+* {
+  box-sizing: border-box;
 }
 
-html,body{
-  margin:0;
-  padding:0;
-  background:var(--bg);
-  color:var(--text);
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
 }
 
-.wrap{
-  max-width:1320px;
-  margin:auto;
-  padding:18px;
+body {
+  overflow-x: hidden;
 }
 
-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  border-bottom:1px solid var(--line);
-  padding-bottom:14px;
+.dashboard {
+  width: 100%;
+  max-width: 1320px;
+  margin: auto;
+  padding: 18px;
 }
 
-.brand{
-  color:var(--gold);
-  font-size:11px;
-  font-weight:700;
-  letter-spacing:2.5px;
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 42px;
+  border-bottom: 1px solid var(--line);
 }
 
-.live{
-  font-size:9px;
-  color:var(--muted);
+.brand {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: var(--gold);
 }
 
-.dot{
-  display:inline-block;
-  width:6px;
-  height:6px;
-  border-radius:50%;
-  background:var(--green);
-  margin-right:5px;
+.source-status {
+  font-size: 10px;
+  color: var(--muted);
+  white-space: nowrap;
 }
 
-.title{
-  padding:20px 0 14px;
+.status-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-right: 6px;
+  border-radius: 50%;
+  background: var(--green);
 }
 
-.title h1{
-  margin:0;
-  font-size:34px;
-  letter-spacing:-1px;
+.heading-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 20px;
+  padding: 18px 0 16px;
 }
 
-.title span{
-  display:block;
-  margin-top:5px;
-  color:var(--muted);
-  font-size:11px;
+.heading-left h1 {
+  margin: 0;
+  font-size: clamp(25px, 4vw, 38px);
+  letter-spacing: -1.1px;
+  line-height: 1.05;
 }
 
-.tabs{
-  display:flex;
-  gap:7px;
-  margin-bottom:9px;
-  overflow:auto;
+.heading-left p {
+  margin: 7px 0 0;
+  color: var(--muted);
+  font-size: 12px;
 }
 
-.tab{
-  border:1px solid var(--line);
-  background:transparent;
-  color:#aaa;
-  padding:8px 13px;
-  cursor:pointer;
-  font-size:10px;
-  white-space:nowrap;
+.last-update {
+  color: var(--muted);
+  font-size: 10px;
+  white-space: nowrap;
 }
 
-.tab.active{
-  background:#f4f4f2;
-  color:#050505;
+.country-tabs {
+  display: flex;
+  gap: 7px;
+  overflow-x: auto;
+  padding: 0 0 14px;
+  scrollbar-width: none;
 }
 
-.gridHero{
-  display:grid;
-  grid-template-columns:2fr 1fr 1fr;
-  gap:8px;
+.country-tabs::-webkit-scrollbar {
+  display: none;
 }
 
-.box{
-  background:var(--panel);
-  border:1px solid var(--line);
+.country-button {
+  appearance: none;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  padding: 8px 13px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .5px;
+  cursor: pointer;
+  white-space: nowrap;
 }
 
-.hero{
-  padding:22px;
+.country-button.active {
+  background: var(--text);
+  color: #050505;
+  border-color: var(--text);
 }
 
-.label{
-  color:var(--muted);
-  font-size:9px;
-  letter-spacing:1.1px;
-  text-transform:uppercase;
+.hero-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 8px;
 }
 
-.mainValue{
-  color:var(--gold);
-  font-size:56px;
-  font-weight:750;
-  margin-top:9px;
-  letter-spacing:-2px;
+.box {
+  background: var(--panel);
+  border: 1px solid var(--line);
 }
 
-.value{
-  font-size:27px;
-  font-weight:700;
-  margin-top:10px;
+.hero-main {
+  padding: 22px;
+  min-height: 142px;
 }
 
-.caption{
-  color:var(--muted);
-  font-size:10px;
-  margin-top:5px;
+.kicker {
+  color: var(--muted);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1.4px;
 }
 
-.metrics{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:8px;
-  margin-top:8px;
+.hero-number {
+  margin-top: 9px;
+  font-size: clamp(44px, 7vw, 72px);
+  line-height: 1;
+  font-weight: 750;
+  letter-spacing: -3px;
 }
 
-.metric{
-  padding:15px;
+.hero-number.gold {
+  color: var(--gold);
 }
 
-.metricValue{
-  font-size:21px;
-  font-weight:700;
-  margin-top:7px;
+.hero-caption {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 11px;
 }
 
-.gold{
-  color:var(--gold);
+.hero-small {
+  padding: 22px;
 }
 
-.content{
-  display:grid;
-  grid-template-columns:1fr 1.4fr;
-  gap:8px;
-  margin-top:8px;
+.hero-small-value {
+  margin-top: 12px;
+  font-size: 29px;
+  font-weight: 700;
+  letter-spacing: -1px;
 }
 
-.panel{
-  padding:18px;
+.hero-small-caption {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 10px;
 }
 
-.panelTitle{
-  font-size:10px;
-  font-weight:700;
-  text-transform:uppercase;
-  letter-spacing:1px;
-  margin-bottom:15px;
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-top: 8px;
 }
 
-.nextAmount{
-  font-size:32px;
-  font-weight:750;
+.metric {
+  padding: 15px 17px;
 }
 
-.small{
-  color:var(--muted);
-  font-size:10px;
-  margin-top:5px;
+.metric-value {
+  margin-top: 7px;
+  font-size: 22px;
+  font-weight: 700;
 }
 
-.countdown{
-  color:var(--gold);
-  font-size:22px;
-  font-weight:700;
-  margin-top:18px;
+.metric-value.gold {
+  color: var(--gold);
 }
 
-.rates{
-  display:grid;
-  grid-template-columns:1fr auto 1fr;
-  align-items:center;
-  gap:15px;
+.content-grid {
+  display: grid;
+  grid-template-columns: .9fr 1.45fr;
+  gap: 8px;
+  margin-top: 8px;
 }
 
-.rate{
-  font-size:25px;
-  font-weight:700;
-  margin-top:7px;
+.panel {
+  padding: 18px;
 }
 
-.arrow{
-  color:#666;
-  font-size:20px;
+.panel-title {
+  margin-bottom: 17px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
 }
 
-.gapRow{
-  display:flex;
-  justify-content:space-between;
-  gap:25px;
-  border-top:1px solid var(--line);
-  margin-top:17px;
-  padding-top:13px;
+.next-value {
+  font-size: 34px;
+  font-weight: 750;
 }
 
-.gapValue{
-  color:var(--gold);
-  font-size:27px;
-  font-weight:750;
+.next-security {
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 11px;
 }
 
-.chartBox{
-  margin-top:8px;
-  padding:18px;
+.countdown {
+  margin-top: 20px;
+  color: var(--gold);
+  font-size: 23px;
+  font-weight: 700;
+  letter-spacing: .5px;
+  font-variant-numeric: tabular-nums;
 }
 
-.chart{
-  height:145px;
-  display:flex;
-  align-items:flex-end;
-  gap:6px;
+.next-date {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 10px;
 }
 
-.barWrap{
-  flex:1;
-  height:100%;
-  display:flex;
-  flex-direction:column;
-  justify-content:flex-end;
+.gap-grid {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 15px;
 }
 
-.bar{
-  background:var(--gold);
-  min-height:2px;
+.rate-value {
+  margin-top: 7px;
+  font-size: 26px;
+  font-weight: 700;
 }
 
-.month{
-  text-align:center;
-  color:#666;
-  font-size:8px;
-  margin-top:5px;
+.gap-arrow {
+  color: #56565a;
+  font-size: 20px;
 }
 
-.tableBox{
-  margin-top:8px;
+.gap-output {
+  margin-top: 19px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 15px;
 }
 
-.tableTitle{
-  padding:15px;
-  font-size:10px;
-  text-transform:uppercase;
-  font-weight:700;
+.gap-bp {
+  font-size: 30px;
+  font-weight: 750;
+  color: var(--gold);
 }
 
-table{
-  width:100%;
-  border-collapse:collapse;
+.cost-change {
+  text-align: right;
 }
 
-th{
-  text-align:left;
-  color:#777;
-  font-size:8px;
-  text-transform:uppercase;
-  padding:9px 12px;
+.cost-number {
+  margin-top: 5px;
+  font-size: 17px;
+  font-weight: 700;
 }
 
-td{
-  border-top:1px solid #1c1c1e;
-  padding:10px 12px;
-  font-size:10px;
+.chart-panel {
+  margin-top: 8px;
+  padding: 18px;
 }
 
-.right{
-  text-align:right;
+.chart {
+  height: 145px;
+  display: flex;
+  align-items: flex-end;
+  gap: 7px;
+  padding-top: 9px;
 }
 
-footer{
-  display:flex;
-  justify-content:space-between;
-  padding:10px 0 0;
-  font-size:8px;
-  color:#5f5f63;
+.bar-wrap {
+  flex: 1;
+  min-width: 16px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
 }
 
-.error{
-  color:var(--red);
-  font-size:36px;
+.bar {
+  min-height: 2px;
+  background: var(--gold);
+  opacity: .88;
 }
 
-.loading{
-  opacity:.5;
+.month-label {
+  padding-top: 5px;
+  color: #65656a;
+  text-align: center;
+  font-size: 8px;
 }
 
-@media(max-width:800px){
+.table-panel {
+  margin-top: 8px;
+}
 
-  .gridHero{
-    grid-template-columns:1fr 1fr;
+.table-title {
+  padding: 16px 18px 10px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  padding: 9px 14px;
+  color: var(--muted);
+  font-size: 8px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-weight: 600;
+  text-align: left;
+}
+
+td {
+  padding: 10px 14px;
+  border-top: 1px solid #1b1b1d;
+  font-size: 11px;
+}
+
+.numeric {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 1px 0;
+  color: #5d5d61;
+  font-size: 8px;
+}
+
+.loading {
+  opacity: .45;
+}
+
+.error-text {
+  color: var(--red);
+}
+
+@media (max-width: 850px) {
+  .hero-grid {
+    grid-template-columns: 1fr 1fr;
   }
 
-  .gridHero .hero:first-child{
-    grid-column:1/-1;
+  .hero-main {
+    grid-column: 1 / -1;
   }
 
-  .metrics{
-    grid-template-columns:1fr 1fr;
+  .metrics {
+    grid-template-columns: 1fr 1fr;
   }
 
-  .content{
-    grid-template-columns:1fr;
+  .content-grid {
+    grid-template-columns: 1fr;
   }
-
 }
 
+@media (max-width: 520px) {
+  .dashboard {
+    padding: 10px;
+  }
+
+  .heading-row {
+    display: block;
+  }
+
+  .hero-number {
+    font-size: 44px;
+  }
+}
 </style>
-
 </head>
 
 <body>
 
-<div class="wrap">
+<div class="dashboard">
 
-<header>
+  <div class="topbar">
+    <div class="brand">BONDSTATS</div>
 
-<div class="brand">
-BONDSTATS
-</div>
+    <div class="source-status">
+      <span class="status-dot"></span>
+      U.S. Treasury Data
+    </div>
+  </div>
 
-<div class="live">
-<span class="dot"></span>
-Official sovereign data
-</div>
+  <div class="heading-row">
+    <div class="heading-left">
+      <h1>Debt Repricing Clock</h1>
+      <p>Sovereign Funding Intelligence</p>
+    </div>
 
-</header>
+    <div class="last-update">
+      Updated <span id="updated">—</span>
+    </div>
+  </div>
 
-<div class="title">
+  <div class="country-tabs">
+    <button class="country-button active">United States</button>
+  </div>
 
-<h1>Debt Repricing Clock</h1>
+  <div id="dashboardContent">
 
-<span>
-Global Sovereign Funding Intelligence
-</span>
+    <div class="hero-grid">
 
-</div>
+      <div class="box hero-main">
+        <div class="kicker">
+          Debt Maturing Within 12 Months
+        </div>
 
-<div class="tabs">
+        <div class="hero-number gold" id="m365">—</div>
 
-<button class="tab active" data-country="US">
-United States
-</button>
+        <div class="hero-caption">
+          United States sovereign debt scheduled to mature
+        </div>
+      </div>
 
-<button class="tab" data-country="GB">
-United Kingdom
-</button>
+      <div class="box hero-small">
+        <div class="kicker">Next 30 Days</div>
+        <div class="hero-small-value" id="m30">—</div>
+        <div class="hero-small-caption">Near-term refinancing</div>
+      </div>
 
-<button class="tab" data-country="DE">
-Germany
-</button>
+      <div class="box hero-small">
+        <div class="kicker">Next 90 Days</div>
+        <div class="hero-small-value" id="m90">—</div>
+        <div class="hero-small-caption">Quarterly refinancing</div>
+      </div>
 
-<button class="tab" data-country="JP">
-Japan
-</button>
+    </div>
 
-</div>
+    <div class="metrics">
 
-<div id="dashboard">
+      <div class="box metric">
+        <div class="kicker">Average / Day</div>
+        <div class="metric-value" id="daily">—</div>
+      </div>
 
-<div class="gridHero">
+      <div class="box metric">
+        <div class="kicker">Average / Month</div>
+        <div class="metric-value" id="monthly">—</div>
+      </div>
 
-<div class="box hero">
+      <div class="box metric">
+        <div class="kicker">Next Maturity</div>
+        <div class="metric-value" id="nextCompact">—</div>
+      </div>
 
-<div class="label">
-Debt Maturing Within 12 Months
-</div>
+      <div class="box metric">
+        <div class="kicker">Repricing Gap</div>
+        <div class="metric-value gold" id="gapCompact">—</div>
+      </div>
 
-<div class="mainValue" id="m365">
-—
-</div>
+    </div>
 
-<div class="caption" id="caption">
-—
-</div>
+    <div class="content-grid">
 
-</div>
+      <div class="box panel">
 
-<div class="box hero">
+        <div class="panel-title">Next Major Maturity</div>
 
-<div class="label">
-Next 30 Days
-</div>
+        <div class="next-value" id="nextAmount">—</div>
 
-<div class="value" id="m30">
-—
-</div>
+        <div class="next-security" id="nextSecurity">—</div>
 
-<div class="caption">
-Near-term refinancing
-</div>
+        <div class="countdown" id="countdown">—</div>
 
-</div>
+        <div class="next-date" id="nextDate">—</div>
 
-<div class="box hero">
+      </div>
 
-<div class="label">
-Next 90 Days
-</div>
+      <div class="box panel">
 
-<div class="value" id="m90">
-—
-</div>
+        <div class="panel-title">Refinancing Cost Gap</div>
 
-<div class="caption">
-Quarterly refinancing
-</div>
+        <div class="gap-grid">
 
-</div>
+          <div>
+            <div class="kicker">Maturing Debt Coupon</div>
+            <div class="rate-value" id="oldRate">—</div>
+          </div>
 
-</div>
+          <div class="gap-arrow">→</div>
 
-<div class="metrics">
+          <div>
+            <div class="kicker">Current Funding Rate</div>
+            <div class="rate-value" id="newRate">—</div>
+          </div>
 
-<div class="box metric">
-<div class="label">Average / Day</div>
-<div class="metricValue" id="daily">—</div>
-</div>
+        </div>
 
-<div class="box metric">
-<div class="label">Average / Month</div>
-<div class="metricValue" id="monthly">—</div>
-</div>
+        <div class="gap-output">
 
-<div class="box metric">
-<div class="label">Next Maturity</div>
-<div class="metricValue" id="nextCompact">—</div>
-</div>
+          <div>
+            <div class="kicker">Repricing Gap</div>
+            <div class="gap-bp" id="gapBp">—</div>
+          </div>
 
-<div class="box metric">
-<div class="label">Repricing Gap</div>
-<div class="metricValue gold" id="gapCompact">—</div>
-</div>
+          <div class="cost-change">
+            <div class="kicker">Estimated Annual Cost Change</div>
+            <div class="cost-number" id="costChange">—</div>
+          </div>
 
-</div>
+        </div>
 
-<div class="content">
+      </div>
 
-<div class="box panel">
+    </div>
 
-<div class="panelTitle">
-Next Major Maturity
-</div>
+    <div class="box chart-panel">
 
-<div class="nextAmount" id="nextAmount">
-—
-</div>
+      <div class="panel-title">12-Month Maturity Profile</div>
 
-<div class="small" id="nextSecurity">
-—
-</div>
+      <div class="chart" id="maturityChart"></div>
 
-<div class="countdown" id="countdown">
-—
-</div>
+    </div>
 
-<div class="small" id="nextDate">
-—
-</div>
+    <div class="box table-panel">
 
-</div>
+      <div class="table-title">Upcoming Maturities</div>
 
-<div class="box panel">
+      <div class="table-scroll">
 
-<div class="panelTitle">
-Refinancing Cost Gap
-</div>
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Security</th>
+              <th>Coupon</th>
+              <th class="numeric">Amount</th>
+            </tr>
+          </thead>
 
-<div class="rates">
+          <tbody id="maturityRows"></tbody>
+        </table>
 
-<div>
+      </div>
 
-<div class="label">
-Maturing Debt Coupon
-</div>
+    </div>
 
-<div class="rate" id="oldRate">
-—
-</div>
+  </div>
 
-</div>
-
-<div class="arrow">
-→
-</div>
-
-<div>
-
-<div class="label">
-Current Funding Rate
-</div>
-
-<div class="rate" id="newRate">
-—
-</div>
-
-</div>
-
-</div>
-
-<div class="gapRow">
-
-<div>
-
-<div class="label">
-Repricing Gap
-</div>
-
-<div class="gapValue" id="gap">
-—
-</div>
-
-</div>
-
-<div>
-
-<div class="label">
-Estimated Annual Cost Change
-</div>
-
-<div class="rate" id="cost">
-—
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-<div class="box chartBox">
-
-<div class="panelTitle">
-12-Month Maturity Profile
-</div>
-
-<div class="chart" id="chart"></div>
-
-</div>
-
-<div class="box tableBox">
-
-<div class="tableTitle">
-Upcoming Maturities
-</div>
-
-<div style="overflow-x:auto">
-
-<table>
-
-<thead>
-
-<tr>
-<th>Date</th>
-<th>Security</th>
-<th>Coupon</th>
-<th class="right">Amount</th>
-</tr>
-
-</thead>
-
-<tbody id="rows"></tbody>
-
-</table>
-
-</div>
-
-</div>
-
-</div>
-
-<footer>
-
-<div id="source">
-Official sovereign source
-</div>
-
-<div>
-Updated <span id="updated">—</span>
-</div>
-
-</footer>
+  <div class="footer">
+    <div id="sourceText">U.S. Treasury Fiscal Data</div>
+    <div>BondStats Ltd.</div>
+  </div>
 
 </div>
 
 <script>
 
 /*
-  ONLY ONE API URL.
-  DO NOT duplicate "const API_BASE".
+IMPORTANT
+
+Hier kommt die EXAKTE Function-URL von:
+
+Supabase
+→ sovereign-repricing
+→ Function URL
+
+NICHT swift-worker.
 */
 
 const API_BASE =
-  "https://cinaleiynhirtlnxnpnb.supabase.co/functions/v1/swift-worker";
+  "https://DEIN-PROJECT-REF.supabase.co/functions/v1/sovereign-repricing";
 
-const COUNTRY = {
+let nextMaturityDate = null;
 
-  US:{
-    name:"United States",
-    symbol:"$"
-  },
+function formatMoney(value) {
 
-  GB:{
-    name:"United Kingdom",
-    symbol:"£"
-  },
-
-  DE:{
-    name:"Germany",
-    symbol:"€"
-  },
-
-  JP:{
-    name:"Japan",
-    symbol:"¥"
-  }
-
-};
-
-let activeCountry = "US";
-let nextDate = null;
-
-function money(v){
-
-  if(
-    v === null ||
-    v === undefined ||
-    !Number.isFinite(Number(v))
-  ){
+  if (
+    value === null ||
+    value === undefined ||
+    !Number.isFinite(Number(value))
+  ) {
     return "—";
   }
 
-  v = Number(v);
+  const v = Number(value);
+  const abs = Math.abs(v);
 
-  const symbol =
-    COUNTRY[activeCountry].symbol;
-
-  const abs =
-    Math.abs(v);
-
-  if(abs >= 1e12)
-    return symbol +
-      (v/1e12).toFixed(2) +
-      "T";
-
-  if(abs >= 1e9)
-    return symbol +
-      (v/1e9).toFixed(1) +
-      "B";
-
-  if(abs >= 1e6)
-    return symbol +
-      (v/1e6).toFixed(1) +
-      "M";
-
-  return symbol +
-    Math.round(v).toLocaleString();
-
-}
-
-function rate(v){
-
-  if(
-    v === null ||
-    v === undefined ||
-    !Number.isFinite(Number(v))
-  )
-    return "—";
-
-  return Number(v)
-    .toFixed(2) + "%";
-
-}
-
-function bp(v){
-
-  if(
-    v === null ||
-    v === undefined ||
-    !Number.isFinite(Number(v))
-  )
-    return "—";
-
-  const x =
-    Math.round(Number(v));
-
-  return (
-    x > 0 ? "+" : ""
-  ) +
-  x +
-  " bp";
-
-}
-
-function countdown(){
-
-  if(!nextDate){
-    document
-      .getElementById("countdown")
-      .textContent = "—";
-
-    return;
+  if (abs >= 1e12) {
+    return "$" + (v / 1e12).toFixed(2) + "T";
   }
+
+  if (abs >= 1e9) {
+    return "$" + (v / 1e9).toFixed(1) + "B";
+  }
+
+  if (abs >= 1e6) {
+    return "$" + (v / 1e6).toFixed(1) + "M";
+  }
+
+  return "$" + Math.round(v).toLocaleString();
+}
+
+function formatRate(value) {
+
+  if (
+    value === null ||
+    value === undefined ||
+    !Number.isFinite(Number(value))
+  ) {
+    return "—";
+  }
+
+  return Number(value).toFixed(2) + "%";
+}
+
+function formatBp(value) {
+
+  if (
+    value === null ||
+    value === undefined ||
+    !Number.isFinite(Number(value))
+  ) {
+    return "—";
+  }
+
+  const v = Math.round(Number(value));
+
+  return (v > 0 ? "+" : "") + v + " bp";
+}
+
+function updateCountdown() {
+
+  if (!nextMaturityDate) return;
+
+  const target =
+    new Date(nextMaturityDate + "T00:00:00Z");
 
   let diff =
-    new Date(
-      nextDate +
-      "T00:00:00Z"
-    ).getTime() -
-    Date.now();
+    target.getTime() - Date.now();
 
-  if(diff <= 0){
+  if (diff <= 0) {
 
-    document
-      .getElementById("countdown")
-      .textContent =
-      "MATURING TODAY";
+    document.getElementById("countdown")
+      .textContent = "MATURING TODAY";
 
     return;
-
   }
 
   const days =
-    Math.floor(
-      diff / 86400000
-    );
+    Math.floor(diff / 86400000);
 
-  diff -=
-    days * 86400000;
+  diff -= days * 86400000;
 
   const hours =
-    Math.floor(
-      diff / 3600000
-    );
+    Math.floor(diff / 3600000);
 
-  diff -=
-    hours * 3600000;
+  diff -= hours * 3600000;
 
   const minutes =
-    Math.floor(
-      diff / 60000
-    );
+    Math.floor(diff / 60000);
 
-  document
-    .getElementById("countdown")
+  document.getElementById("countdown")
     .textContent =
     `${days}D ${String(hours).padStart(2,"0")}H ${String(minutes).padStart(2,"0")}M`;
-
 }
 
-function chart(data){
+function renderChart(data) {
 
-  const el =
-    document.getElementById("chart");
+  const chart =
+    document.getElementById("maturityChart");
 
-  el.innerHTML = "";
+  chart.innerHTML = "";
 
-  if(
-    !Array.isArray(data) ||
-    !data.length
-  )
+  if (!Array.isArray(data) || !data.length) {
     return;
+  }
 
   const max =
     Math.max(
-      ...data.map(
-        x => Number(x.amount || 0)
-      ),
+      ...data.map(x => Number(x.amount || 0)),
       1
     );
 
-  data.forEach(x => {
+  data.forEach(item => {
 
     const wrap =
       document.createElement("div");
 
-    wrap.className =
-      "barWrap";
+    wrap.className = "bar-wrap";
 
     const bar =
       document.createElement("div");
 
-    bar.className =
-      "bar";
+    bar.className = "bar";
 
     bar.style.height =
       Math.max(
         2,
-        Number(x.amount || 0) /
-        max *
-        110
+        Number(item.amount || 0) / max * 110
       ) + "px";
 
-    bar.title =
-      `${x.month} · ${money(x.amount)}`;
-
-    const month =
+    const label =
       document.createElement("div");
 
-    month.className =
-      "month";
+    label.className = "month-label";
 
-    month.textContent =
-      String(x.month || "")
-        .slice(5);
+    label.textContent =
+      String(item.month || "").slice(5);
 
-    wrap.append(
-      bar,
-      month
-    );
+    wrap.append(bar, label);
 
-    el.appendChild(
-      wrap
-    );
-
+    chart.appendChild(wrap);
   });
-
 }
 
-function table(rows){
+function renderTable(rows) {
 
-  const body =
-    document.getElementById("rows");
+  const tbody =
+    document.getElementById("maturityRows");
 
-  body.innerHTML = "";
+  tbody.innerHTML = "";
 
-  (rows || [])
-    .slice(0,10)
-    .forEach(x => {
+  if (!Array.isArray(rows)) return;
 
-      const tr =
-        document.createElement("tr");
+  rows.slice(0, 10).forEach(item => {
 
-      tr.innerHTML = `
-        <td>${x.date || "—"}</td>
-        <td>${x.security || "—"}</td>
-        <td>${rate(x.coupon)}</td>
-        <td class="right">${money(x.amount)}</td>
-      `;
+    const tr =
+      document.createElement("tr");
 
-      body.appendChild(
-        tr
-      );
+    tr.innerHTML = `
+      <td>${item.date || "—"}</td>
+      <td>${item.security || "—"}</td>
+      <td>${formatRate(item.coupon)}</td>
+      <td class="numeric">${formatMoney(item.amount)}</td>
+    `;
 
-    });
-
+    tbody.appendChild(tr);
+  });
 }
 
-function render(d){
+function render(data) {
 
-  const m =
-    d.maturing || {};
+  const maturing =
+    data.maturing || {};
 
-  const c =
-    d.coupon || {};
+  const coupon =
+    data.coupon || {};
 
   const next =
-    d.next_maturity || {};
+    data.next_maturity || {};
 
   document.getElementById("m365")
     .textContent =
-    money(m["365d"]);
+    formatMoney(maturing["365d"]);
 
   document.getElementById("m30")
     .textContent =
-    money(m["30d"]);
+    formatMoney(maturing["30d"]);
 
   document.getElementById("m90")
     .textContent =
-    money(m["90d"]);
+    formatMoney(maturing["90d"]);
 
   document.getElementById("daily")
     .textContent =
-    money(d.average_daily);
+    formatMoney(data.average_daily);
 
   document.getElementById("monthly")
     .textContent =
-    money(
-      Number(
-        m["365d"] || 0
-      ) / 12
+    formatMoney(
+      Number(maturing["365d"] || 0) / 12
     );
 
   document.getElementById("nextCompact")
     .textContent =
-    money(next.amount);
+    formatMoney(next.amount);
 
   document.getElementById("gapCompact")
     .textContent =
-    bp(c.gap_bp);
+    formatBp(coupon.gap_bp);
 
   document.getElementById("nextAmount")
     .textContent =
-    money(next.amount);
+    formatMoney(next.amount);
 
   document.getElementById("nextSecurity")
     .textContent =
@@ -941,208 +845,102 @@ function render(d){
     .textContent =
     next.date || "—";
 
-  nextDate =
+  nextMaturityDate =
     next.date || null;
 
-  countdown();
+  updateCountdown();
 
   document.getElementById("oldRate")
     .textContent =
-    rate(
-      c.maturing_average
-    );
+    formatRate(coupon.maturing_average);
 
   document.getElementById("newRate")
     .textContent =
-    rate(
-      c.current_reference
-    );
+    formatRate(coupon.current_reference);
 
-  document.getElementById("gap")
+  document.getElementById("gapBp")
     .textContent =
-    bp(
-      c.gap_bp
-    );
+    formatBp(coupon.gap_bp);
 
-  document.getElementById("cost")
+  document.getElementById("costChange")
     .textContent =
-    c.estimated_annual_cost_change === null ||
-    c.estimated_annual_cost_change === undefined
+    coupon.estimated_annual_cost_change === null ||
+    coupon.estimated_annual_cost_change === undefined
       ? "—"
-      : money(
-          c.estimated_annual_cost_change
+      : formatMoney(
+          coupon.estimated_annual_cost_change
         ) + " / yr";
-
-  document.getElementById("caption")
-    .textContent =
-    `${COUNTRY[activeCountry].name} sovereign debt scheduled to mature`;
-
-  document.getElementById("source")
-    .textContent =
-    d.source ||
-    "Official sovereign source";
 
   document.getElementById("updated")
     .textContent =
-    d.updated
-      ? new Date(
-          d.updated
-        ).toLocaleString()
+    data.updated
+      ? new Date(data.updated).toLocaleString()
       : "—";
 
-  chart(
-    d.maturity_timeline
-  );
+  document.getElementById("sourceText")
+    .textContent =
+    data.source ||
+    "U.S. Treasury Fiscal Data";
 
-  table(
-    d.upcoming
-  );
+  renderChart(data.maturity_timeline);
+
+  renderTable(data.upcoming);
 
   document
-    .getElementById("dashboard")
+    .getElementById("dashboardContent")
     .classList.remove("loading");
-
 }
 
-function reset(){
+function showError(error) {
+
+  console.error(error);
 
   document
-    .getElementById("dashboard")
+    .getElementById("dashboardContent")
+    .classList.remove("loading");
+
+  document.getElementById("m365")
+    .innerHTML =
+    '<span class="error-text">DATA UNAVAILABLE</span>';
+}
+
+async function loadUS() {
+
+  document
+    .getElementById("dashboardContent")
     .classList.add("loading");
 
-  [
-    "m365",
-    "m30",
-    "m90",
-    "daily",
-    "monthly",
-    "nextCompact",
-    "gapCompact",
-    "nextAmount",
-    "nextSecurity",
-    "countdown",
-    "nextDate",
-    "oldRate",
-    "newRate",
-    "gap",
-    "cost"
-  ].forEach(id => {
-
-    document
-      .getElementById(id)
-      .textContent = "—";
-
-  });
-
-  document
-    .getElementById("chart")
-    .innerHTML = "";
-
-  document
-    .getElementById("rows")
-    .innerHTML = "";
-
-}
-
-function showError(message){
-
-  document
-    .getElementById("dashboard")
-    .classList.remove("loading");
-
-  document
-    .getElementById("m365")
-    .innerHTML =
-    '<span class="error">DATA UNAVAILABLE</span>';
-
-  document
-    .getElementById("caption")
-    .textContent =
-    message ||
-    "Official data source temporarily unavailable";
-
-}
-
-async function loadCountry(code){
-
-  activeCountry =
-    code;
-
-  nextDate =
-    null;
-
-  reset();
-
-  document
-    .querySelectorAll(".tab")
-    .forEach(btn => {
-
-      btn.classList.toggle(
-        "active",
-        btn.dataset.country === code
-      );
-
-    });
-
-  try{
+  try {
 
     const response =
       await fetch(
-        `${API_BASE}?country=${encodeURIComponent(code)}&t=${Date.now()}`,
+        API_BASE + "?country=US&t=" + Date.now(),
         {
-          cache:"no-store"
+          cache: "no-store"
         }
       );
 
     const data =
       await response.json();
 
-    if(
-      !response.ok ||
-      data.status === "error"
-    ){
-
+    if (!response.ok || data.status === "error") {
       throw new Error(
-        data.message ||
-        "Data service error"
+        data.message || "API request failed"
       );
-
     }
 
     render(data);
 
-  }catch(error){
+  } catch (error) {
 
-    console.error(error);
-
-    showError(
-      error instanceof Error
-        ? error.message
-        : "Data unavailable"
-    );
-
+    showError(error);
   }
-
 }
 
-document
-  .querySelectorAll(".tab")
-  .forEach(btn => {
-
-    btn.addEventListener(
-      "click",
-      () =>
-        loadCountry(
-          btn.dataset.country
-        )
-    );
-
-  });
-
-loadCountry("US");
+loadUS();
 
 setInterval(
-  countdown,
+  updateCountdown,
   60000
 );
 
